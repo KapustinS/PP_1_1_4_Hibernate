@@ -43,7 +43,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "INSERT INTO USERS (NAME, LASTNAME, AGE) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO users (name, lastname, age) VALUES(?, ?, ?)";
 
         try(Connection connection = getConnect();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -58,7 +58,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     }
 
     public void removeUserById(long id) {
-        String sql = "DELETE FROM USERS WHERE ID=?";
+        String sql = "DELETE FROM users WHERE id=?";
 
         try(Connection connection = getConnect();
         PreparedStatement preparedStatement = connection.prepareStatement(sql)){
@@ -74,7 +74,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     }
 
     public List<User> getAllUsers() {
-        String sql = "SELECT ID, NAME, LASTNAME, AGE FROM USERS";
+        String sql = "SELECT id, name, lastname, age FROM users";
         List<User> userList = new ArrayList<>();
 
         try(Connection connection = getConnect();
@@ -82,10 +82,10 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()){
                 User user = new User();
-                user.setId(resultSet.getLong("ID"));
-                user.setName(resultSet.getString("NAME"));
-                user.setLastName(resultSet.getString("LASTNAME"));
-                user.setAge(resultSet.getByte("AGE"));
+                user.setId(resultSet.getLong("id"));
+                user.setName(resultSet.getString("name"));
+                user.setLastName(resultSet.getString("lastname"));
+                user.setAge(resultSet.getByte("age"));
 
                 userList.add(user);
             }
@@ -97,7 +97,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     }
 
     public void cleanUsersTable() {
-        String sql = "DELETE FROM USERS";
+        String sql = "DELETE FROM users";
         try(Connection connection = getConnect();
             Statement statement = connection.createStatement()){
                 statement.executeUpdate(sql);
