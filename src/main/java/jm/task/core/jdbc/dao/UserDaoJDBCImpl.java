@@ -1,149 +1,132 @@
 package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
-import jm.task.core.jdbc.util.Util;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jm.task.core.jdbc.util.Util.getSessionFactory;
+
 public class UserDaoJDBCImpl implements UserDao {
-    private final Connection connection;
 
     public UserDaoJDBCImpl() {
-        connection = Util.getConnect();
+
     }
 
     @Override
     public void createUsersTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS `mydbtest`.`users` (" +
+        String sql = "CREATE TABLE IF NOT EXISTS `users` (" +
                 "  `id` BIGINT NOT NULL AUTO_INCREMENT, " +
                 "  `name` VARCHAR(45) NOT NULL, " +
                 "  `lastname` VARCHAR(45) NOT NULL, " +
                 "  `age` INT NOT NULL, " +
                 "  PRIMARY KEY (`id`));";
+        Transaction transaction = null;
 
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
-            connection.commit();
-        } catch (SQLException e) {
-            System.out.println("Create table \"users\" - error");
-            e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        try (Session session = getSessionFactory().getCurrentSession()) {
+            transaction = session.beginTransaction();
+            session.createNativeQuery(sql, User.class).executeUpdate();
+            transaction.commit();
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
+            e.printStackTrace();
         }
-
     }
 
     @Override
     public void dropUsersTable() {
         String sql = "DROP TABLE IF EXISTS users;";
+        Transaction transaction = null;
 
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
+        try (Session session = getSessionFactory().getCurrentSession()) {
+            transaction = session.beginTransaction();
+            session.createNativeQuery(sql).executeUpdate();
+            transaction.commit();
 
-            connection.commit();
-        } catch (SQLException e) {
-            System.out.println("Create table \"users\" - error");
-            e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
+            e.printStackTrace();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "INSERT INTO users (name, lastname, age) VALUES(?, ?, ?)";
+        Transaction transaction = null;
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, lastName);
-            preparedStatement.setByte(3, age);
+        try (Session session = getSessionFactory().getCurrentSession()) {
+            transaction = session.beginTransaction();
+            User user = new User(name, lastName, age);
+            session.save(user);
+            transaction.commit();
 
-            preparedStatement.executeUpdate();
-
-            connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
+            e.printStackTrace();
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        String sql = "DELETE FROM users WHERE id=?";
+        Transaction transaction = null;
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, id);
-
-            preparedStatement.executeUpdate();
-
-            connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        try (Session session = getSessionFactory().getCurrentSession()) {
+            transaction = session.beginTransaction();
+            User user = session.get(User.class, id);
+            session.remove(user);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
+            e.printStackTrace();
         }
-
     }
 
     @Override
     public List<User> getAllUsers() {
-        String sql = "SELECT * FROM users";
         List<User> userList = new ArrayList<>();
+        Transaction transaction = null;
 
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                User user = new User();
-                user.setId(resultSet.getLong("id"));
-                user.setName(resultSet.getString("name"));
-                user.setLastName(resultSet.getString("lastname"));
-                user.setAge(resultSet.getByte("age"));
+        try (Session session = getSessionFactory().getCurrentSession()) {
+            transaction = session.beginTransaction();
+            userList = session.createQuery("SELECT i FROM User i", User.class).getResultList();
+            transaction.commit();
 
-                userList.add(user);
-
-                connection.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
-        } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
         }
+
         return userList;
     }
 
     @Override
     public void cleanUsersTable() {
-        String sql = "DELETE FROM users";
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
+        Transaction transaction = null;
 
-            connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+        try (Session session = getSessionFactory().getCurrentSession()) {
+            transaction = session.beginTransaction();
+            session.createQuery("delete from User").executeUpdate();
+            transaction.commit();
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
+            e.printStackTrace();
         }
-
     }
+
 }
