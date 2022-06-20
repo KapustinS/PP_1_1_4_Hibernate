@@ -15,12 +15,12 @@ public class Main {
         userService.saveUser("Agafon", "Agafonov", (byte) 22);
         userService.saveUser("Evlampiy", "Evlampiev", (byte) 22);
         userService.saveUser("Vavilen", "Tatarskiy", (byte) 22);
-//
+
 //        userService.removeUserById(1);
 
         userService.getAllUsers();
 
-//        userService.cleanUsersTable();
+        userService.cleanUsersTable();
 
 //        userService.dropUsersTable();
     }

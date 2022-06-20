@@ -1,7 +1,7 @@
 package jm.task.core.jdbc.model;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
