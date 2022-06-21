@@ -10,10 +10,6 @@ import java.util.List;
 import static jm.task.core.jdbc.util.Util.getSessionFactory;
 
 public class UserDaoHibernateImpl implements UserDao {
-    public UserDaoHibernateImpl() {
-
-    }
-
 
     @Override
     public void createUsersTable() {

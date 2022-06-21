@@ -7,16 +7,6 @@ import jakarta.persistence.*;
 @Table(name = "users")
 public class User {
 
-    public User() {
-
-    }
-
-    public User(String name, String lastName, Byte age) {
-        this.name = name;
-        this.lastName = lastName;
-        this.age = age;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -32,6 +22,15 @@ public class User {
     private Byte age;
 
 
+    public User() {
+
+    }
+
+    public User(String name, String lastName, Byte age) {
+        this.name = name;
+        this.lastName = lastName;
+        this.age = age;
+    }
 
 
     public Long getId() {
